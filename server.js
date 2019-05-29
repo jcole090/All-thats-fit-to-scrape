@@ -8,21 +8,19 @@ const mongoose = require("mongoose");
 
 const db = require("./models");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 7000;
 const app = express();
 
-// Parse request body as JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Set Handlebars as default engine
+
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-// Serve public files
+
 app.use(express.static("public"));
 
-// Connect to MongoDB
 var databaseUri = "mongodb://localhost/mongoHeadlines";
 if (process.env.MONGODB_URI) {
     mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
@@ -30,8 +28,6 @@ if (process.env.MONGODB_URI) {
     mongoose.connect(databaseUri, { useNewUrlParser: true });
 }
 
-// Routes
-// Home page
 app.get("/", function(req, res) {
     db.Article.find({saved: false}).then(function(dbArticles) {
         res.render("home", {articles: dbArticles}); 
@@ -50,8 +46,9 @@ app.get("/saved", function (req, res) {
 });
 
 app.get("/scrape", function (req, res) {
-    axios.get("https://www.nytimes.com/section/style").then(function (response) {
-        var $ = cheerio.load(response.data);
+    axios.get("https://www.nytimes.com/section/sports").then(function (response) {
+       console.log(response)
+    var $ = cheerio.load(response.data);
         $("article").each(function (i, element) {
 
             var title = $(element).find("h2").text();
